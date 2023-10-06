@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:meals/core/router/app_router.dart';
 import 'package:meals/features/meals/domain/entities/meal_entity.dart';
 
 class MealItem extends StatelessWidget {
@@ -7,18 +8,17 @@ class MealItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
+    return Card(
+      shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(15),
-        color: Colors.grey.withAlpha(5),
       ),
       child: InkWell(
         borderRadius: BorderRadius.circular(15),
         onTap: () {
-          // Navigator.of(context).pushNamed(
-          //   AppRouter.mealsRoute,
-          //   arguments: category,
-          // );
+          Navigator.of(context).pushNamed(
+            AppRouter.mealDetailsRoute,
+            arguments: meal.id,
+          );
         },
         child: Column(
           children: [
@@ -37,6 +37,7 @@ class MealItem extends StatelessWidget {
               meal.name,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.titleLarge,
             ),
           ],

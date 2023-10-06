@@ -15,3 +15,12 @@ class FetchMealsByQuery extends MealsEvent {
   @override
   List<Object> get props => [query];
 }
+
+class FetchMealById extends MealsEvent {
+  final String id;
+
+  const FetchMealById(this.id);
+
+  @override
+  List<Object> get props => [id];
+}

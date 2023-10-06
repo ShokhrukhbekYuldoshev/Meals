@@ -1,22 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:meals/features/categories/data/models/category_model.dart';
+import 'package:meals/features/meals/domain/entities/meal_entity.dart';
 import 'package:meals/features/meals/presentation/bloc/meals_bloc.dart';
 import 'package:meals/features/meals/presentation/widgets/meal_item.dart';
 
-class MealsPage extends StatefulWidget {
+class MealListPage extends StatefulWidget {
   final CategoryModel category;
 
-  const MealsPage({
+  const MealListPage({
     Key? key,
     required this.category,
   }) : super(key: key);
 
   @override
-  State<MealsPage> createState() => _MealsPageState();
+  State<MealListPage> createState() => _MealListPageState();
 }
 
-class _MealsPageState extends State<MealsPage> {
+class _MealListPageState extends State<MealListPage> {
+  final List<MealEntity> meals = [];
+
   @override
   void initState() {
     super.initState();
@@ -31,14 +34,29 @@ class _MealsPageState extends State<MealsPage> {
       appBar: AppBar(
         title: Text(widget.category.name ?? ''),
       ),
-      body: BlocBuilder<MealsBloc, MealsState>(
-        builder: (context, state) {
+      body: BlocListener<MealsBloc, MealsState>(
+        listener: (context, state) {
           if (state is MealsLoaded) {
+            meals.clear();
+            meals.addAll(state.meals);
+          }
+        },
+        child: BlocBuilder<MealsBloc, MealsState>(
+          builder: (context, state) {
+            if (state is MealsLoading) {
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
+            } else if (state is MealsError) {
+              return Center(
+                child: Text(state.message),
+              );
+            }
             return GridView.builder(
               padding: const EdgeInsets.all(25),
-              itemCount: state.meals.length,
+              itemCount: meals.length,
               itemBuilder: (context, index) {
-                final meal = state.meals[index];
+                final meal = meals[index];
 
                 return MealItem(meal: meal);
               },
@@ -49,20 +67,8 @@ class _MealsPageState extends State<MealsPage> {
                 mainAxisSpacing: 50,
               ),
             );
-          } else if (state is MealsLoading) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          } else if (state is MealsError) {
-            return Center(
-              child: Text(state.message),
-            );
-          } else {
-            return const Center(
-              child: Text('Something went wrong'),
-            );
-          }
-        },
+          },
+        ),
       ),
     );
   }

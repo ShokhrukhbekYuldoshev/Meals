@@ -1,4 +1,3 @@
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
 import 'core/di/injector.dart';
@@ -13,9 +12,7 @@ class MainApp extends StatelessWidget {
     return MaterialApp(
       theme: sl<AppTheme>().lightTheme,
       darkTheme: sl<AppTheme>().darkTheme,
-      localizationsDelegates: context.localizationDelegates,
-      supportedLocales: context.supportedLocales,
-      locale: context.locale,
+      // themeMode: ThemeMode.light,
       onGenerateRoute: (settings) => sl<AppRouter>().generateRoute(settings),
     );
   }

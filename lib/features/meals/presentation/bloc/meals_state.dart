@@ -28,3 +28,21 @@ class MealsError extends MealsState {
   @override
   List<Object> get props => [message];
 }
+
+class MealLoaded extends MealsState {
+  final MealEntity meal;
+
+  const MealLoaded(this.meal);
+
+  @override
+  List<Object> get props => [meal];
+}
+
+class MealError extends MealsState {
+  final String message;
+
+  const MealError(this.message);
+
+  @override
+  List<Object> get props => [message];
+}

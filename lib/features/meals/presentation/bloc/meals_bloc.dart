@@ -2,6 +2,7 @@ import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:meals/core/di/injector.dart';
 import 'package:meals/features/meals/domain/entities/meal_entity.dart';
+import 'package:meals/features/meals/domain/usecases/get_meal_by_id_usecase.dart';
 import 'package:meals/features/meals/domain/usecases/get_meal_list_usecase.dart';
 
 part 'meals_event.dart';
@@ -17,6 +18,16 @@ class MealsBloc extends Bloc<MealsEvent, MealsState> {
       result.fold(
         (failure) => emit(MealsError(failure.toString())),
         (meals) => emit(MealsLoaded(meals)),
+      );
+    });
+
+    on<FetchMealById>((event, emit) async {
+      emit(MealsLoading());
+      final result = await sl<GetMealByIdUseCase>().call(event.id);
+
+      result.fold(
+        (failure) => emit(MealError(failure.toString())),
+        (meal) => emit(MealLoaded(meal)),
       );
     });
   }

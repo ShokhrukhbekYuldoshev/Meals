@@ -12,4 +12,11 @@ class MealDatasource {
     final response = await networkService.getRequest(url);
     return response;
   }
+
+  Future<Response> fetchMealById(String id) async {
+    final String url = '/lookup.php?i=$id';
+
+    final response = await networkService.getRequest(url);
+    return response;
+  }
 }

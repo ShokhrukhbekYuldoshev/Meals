@@ -22,4 +22,16 @@ class MealRepositoryImpl implements MealRepository {
       return Left(ServerFailure());
     }
   }
+
+  @override
+  Future<Either<Failure, MealModel>> getMealsById(String id) async {
+    try {
+      final response = await mealDatasource.fetchMealById(id);
+      final meal = MealModel.fromJson(response.data['meals'][0]);
+
+      return Right(meal);
+    } catch (e) {
+      return Left(ServerFailure());
+    }
+  }
 }

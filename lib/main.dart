@@ -1,4 +1,3 @@
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:meals/features/categories/presentation/bloc/categories_bloc.dart';
@@ -14,9 +13,6 @@ Future<void> main() async {
   // Initialize dependency injection
   init();
 
-  // Initialize localization
-  await EasyLocalization.ensureInitialized();
-
   // Run app
   runApp(
     MultiBlocProvider(
@@ -28,17 +24,7 @@ Future<void> main() async {
           create: (context) => sl<MealsBloc>(),
         ),
       ],
-      child: EasyLocalization(
-        supportedLocales: const [
-          Locale('en'),
-          Locale('ru'),
-        ],
-        path:
-            'assets/translations', // <-- change the path of the translation files
-        fallbackLocale: const Locale('en'),
-        useOnlyLangCode: true,
-        child: const MainApp(),
-      ),
+      child: const MainApp(),
     ),
   );
 }

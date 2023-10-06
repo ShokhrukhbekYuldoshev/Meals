@@ -9,6 +9,7 @@ import 'package:meals/features/categories/presentation/bloc/categories_bloc.dart
 import 'package:meals/features/meals/data/datasources/meal_datasource.dart';
 import 'package:meals/features/meals/data/repositories/meal_repository_impl.dart';
 import 'package:meals/features/meals/domain/repositories/meal_repository.dart';
+import 'package:meals/features/meals/domain/usecases/get_meal_by_id_usecase.dart';
 import 'package:meals/features/meals/domain/usecases/get_meal_list_usecase.dart';
 import 'package:meals/features/meals/presentation/bloc/meals_bloc.dart';
 
@@ -69,6 +70,7 @@ void init() {
 
   // Usecases
   sl.registerLazySingleton(() => GetMealListUseCase(sl()));
+  sl.registerLazySingleton(() => GetMealByIdUseCase(sl()));
 
   // Repository
   sl.registerLazySingleton<MealRepository>(
