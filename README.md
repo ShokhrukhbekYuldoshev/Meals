@@ -1,5 +1,16 @@
 # 🍴 Meals
 
+<!-- codemagic status -->
+
+[![Codemagic build status](https://api.codemagic.io/apps/6522a4b96aa51bb12d48ec88/6522a4b96aa51bb12d48ec87/status_badge.svg)](https://codemagic.io/apps/6522a4b96aa51bb12d48ec88/6522a4b96aa51bb12d48ec87/latest_build)
+
+<!-- download codemagic android ios  -->
+
+[![Download Android](https://img.shields.io/badge/Download-Android-green.svg)](https://api.codemagic.io/artifacts/f4239bb3-189f-4f68-a5ba-3611a0d9e674/e16dd854-c9a8-4950-8197-c5c44dca17cc/app-debug.aab)
+[![Download iOS](https://img.shields.io/badge/Download-iOS-blue.svg)](https://api.codemagic.io/artifacts/43194651-3c10-424c-9746-9c5ce2c3e0b1/2c61c7bb-9368-4c9f-9933-1b73b6a51c90/Runner.app.zip)
+
+## 📝 Description
+
 Flutter app that uses Clean Architecture with Bloc and the [themealdb.com](https://www.themealdb.com/) API.
 
 ## 📱 Platforms

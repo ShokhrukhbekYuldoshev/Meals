@@ -2,12 +2,12 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:meals/features/categories/presentation/bloc/categories_bloc.dart';
-import 'package:meals/features/meals/presentation/bloc/meals_bloc.dart';
 import 'package:window_manager/window_manager.dart';
 
-import 'app.dart';
-import 'core/di/injector.dart';
+import 'package:meals/app.dart';
+import 'package:meals/core/di/injector.dart';
+import 'package:meals/features/categories/presentation/bloc/categories_bloc.dart';
+import 'package:meals/features/meals/presentation/bloc/meals_bloc.dart';
 
 Future<void> main() async {
   // Ensure that the Flutter binding has been initialized
