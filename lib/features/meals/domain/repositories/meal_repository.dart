@@ -6,4 +6,12 @@ abstract class MealRepository {
   Future<Either<Failure, List<MealEntity>>> getMealsByQuery(String query);
 
   Future<Either<Failure, MealEntity>> getMealsById(String id);
+
+  Future<Either<Failure, List<MealEntity>>> listMealsByFirstLetter(
+    String letter,
+  );
+
+  Future<Either<Failure, MealEntity>> lookupRandomMeal();
+
+  Future<Either<Failure, List<MealEntity>>> searchMealsByName(String name);
 }

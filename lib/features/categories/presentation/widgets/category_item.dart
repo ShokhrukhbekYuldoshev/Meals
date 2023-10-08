@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:meals/core/router/app_router.dart';
 import 'package:meals/features/categories/domain/entities/category_entity.dart';
+import 'package:meals/features/meals/presentation/bloc/meals_bloc.dart';
+import 'package:meals/features/meals/presentation/pages/meal_list_page.dart';
 
 class CategoryItem extends StatelessWidget {
   final CategoryEntity category;
@@ -18,8 +20,11 @@ class CategoryItem extends StatelessWidget {
         borderRadius: BorderRadius.circular(15),
         onTap: () {
           Navigator.of(context).pushNamed(
-            AppRouter.mealsRoute,
-            arguments: category,
+            AppRouter.mealListRoute,
+            arguments: MealListPageArguments(
+              event: GetMealsByQuery("c=${category.name}"),
+              title: category.name ?? '',
+            ),
           );
         },
         child: Padding(

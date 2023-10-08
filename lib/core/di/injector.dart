@@ -11,6 +11,9 @@ import 'package:meals/features/meals/data/repositories/meal_repository_impl.dart
 import 'package:meals/features/meals/domain/repositories/meal_repository.dart';
 import 'package:meals/features/meals/domain/usecases/get_meal_by_id_usecase.dart';
 import 'package:meals/features/meals/domain/usecases/get_meal_list_usecase.dart';
+import 'package:meals/features/meals/domain/usecases/list_meals_by_first_letter_usecase.dart';
+import 'package:meals/features/meals/domain/usecases/lookup_random_meal_usecase.dart';
+import 'package:meals/features/meals/domain/usecases/search_meals_by_name_usecase.dart';
 import 'package:meals/features/meals/presentation/bloc/meals_bloc.dart';
 
 import '../constants/assets.dart';
@@ -71,6 +74,9 @@ void init() {
   // Usecases
   sl.registerLazySingleton(() => GetMealListUseCase(sl()));
   sl.registerLazySingleton(() => GetMealByIdUseCase(sl()));
+  sl.registerLazySingleton(() => ListMealsByFirstLetterUseCase(sl()));
+  sl.registerLazySingleton(() => LookupRandomMealUseCase(sl()));
+  sl.registerLazySingleton(() => SearchMealsByNameUseCase(sl()));
 
   // Repository
   sl.registerLazySingleton<MealRepository>(

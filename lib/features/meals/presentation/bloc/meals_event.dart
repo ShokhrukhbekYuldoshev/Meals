@@ -7,20 +7,40 @@ abstract class MealsEvent extends Equatable {
   List<Object> get props => [];
 }
 
-class FetchMealsByQuery extends MealsEvent {
+class GetMealsByQuery extends MealsEvent {
   final String query;
 
-  const FetchMealsByQuery(this.query);
+  const GetMealsByQuery(this.query);
 
   @override
   List<Object> get props => [query];
 }
 
-class FetchMealById extends MealsEvent {
+class GetMealById extends MealsEvent {
   final String id;
 
-  const FetchMealById(this.id);
+  const GetMealById(this.id);
 
   @override
   List<Object> get props => [id];
+}
+
+class ListMealsByFirstLetter extends MealsEvent {
+  final String letter;
+
+  const ListMealsByFirstLetter(this.letter);
+
+  @override
+  List<Object> get props => [letter];
+}
+
+class LookupRandomMeal extends MealsEvent {}
+
+class SearchMealsByName extends MealsEvent {
+  final String name;
+
+  const SearchMealsByName(this.name);
+
+  @override
+  List<Object> get props => [name];
 }

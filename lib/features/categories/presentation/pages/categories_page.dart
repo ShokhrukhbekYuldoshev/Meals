@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-// import 'package:meals/core/di/injector.dart';
 import 'package:meals/features/categories/presentation/bloc/categories_bloc.dart';
 import 'package:meals/features/categories/presentation/widgets/category_item.dart';
 
@@ -9,40 +8,33 @@ class CategoriesPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // final categoriesBloc = sl<CategoriesBloc>();
+    return BlocBuilder<CategoriesBloc, CategoriesState>(
+      builder: (context, state) {
+        if (state is CategoriesLoading) {
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        } else if (state is CategoriesLoaded) {
+          return ListView.builder(
+            itemCount: state.categories.length,
+            padding: const EdgeInsets.all(25),
+            itemBuilder: (context, index) {
+              final category = state.categories[index];
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Categories'),
-      ),
-      body: BlocBuilder<CategoriesBloc, CategoriesState>(
-        builder: (context, state) {
-          if (state is CategoriesLoading) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          } else if (state is CategoriesLoaded) {
-            return ListView.builder(
-              itemCount: state.categories.length,
-              padding: const EdgeInsets.all(25),
-              itemBuilder: (context, index) {
-                final category = state.categories[index];
-
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    CategoryItem(category: category),
-                    const SizedBox(height: 20),
-                  ],
-                );
-              },
-            );
-          } else if (state is CategoriesError) {
-            return Text(state.message);
-          }
-          return Container(); // Default empty state.
-        },
-      ),
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  CategoryItem(category: category),
+                  const SizedBox(height: 20),
+                ],
+              );
+            },
+          );
+        } else if (state is CategoriesError) {
+          return Text(state.message);
+        }
+        return Container(); // Default empty state.
+      },
     );
   }
 }

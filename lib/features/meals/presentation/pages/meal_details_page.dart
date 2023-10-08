@@ -16,7 +16,7 @@ class _MealDetailsPageState extends State<MealDetailsPage> {
   @override
   void initState() {
     super.initState();
-    BlocProvider.of<MealsBloc>(context).add(FetchMealById(widget.id));
+    BlocProvider.of<MealsBloc>(context).add(GetMealById(widget.id));
   }
 
   @override
@@ -161,7 +161,7 @@ class _MealDetailsPageState extends State<MealDetailsPage> {
           ),
         ),
       );
-    } else if (state is MealError) {
+    } else if (state is MealsError) {
       return Center(
         child: Text(state.message),
       );
@@ -170,6 +170,5 @@ class _MealDetailsPageState extends State<MealDetailsPage> {
         child: CircularProgressIndicator(),
       );
     }
-    ;
   }
 }

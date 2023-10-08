@@ -9,7 +9,6 @@ environment:
 dependencies:
     flutter:
         sdk: flutter
-    cupertino_icons: ^1.0.6
     bloc: ^8.1.2
     equatable: ^2.0.5
     get_it: ^7.6.4
@@ -18,6 +17,7 @@ dependencies:
     dartz: ^0.10.1
     dio: ^5.3.3
     url_launcher: ^6.1.14
+    window_manager: ^0.3.6
 
 dev_dependencies:
     flutter_test:
@@ -29,8 +29,13 @@ flutter:
     uses-material-design: true
 
 flutter_launcher_icons:
-    image_path: 'assets/images/logo.png'
+    image_path: 'assets/icon/icon.png'
     android: true
     ios: true
+    windows:
+        generate: true
+        icon_size: 48 # min:48, max:256, default: 48
+    macos:
+        generate: true
 # dart pub get
-# dart pub run flutter_launcher_icons
+# dart run flutter_launcher_icons

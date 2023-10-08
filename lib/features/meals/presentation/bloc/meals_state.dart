@@ -38,11 +38,11 @@ class MealLoaded extends MealsState {
   List<Object> get props => [meal];
 }
 
-class MealError extends MealsState {
-  final String message;
+class RandomMealLoaded extends MealsState {
+  final MealEntity meal;
 
-  const MealError(this.message);
+  const RandomMealLoaded(this.meal);
 
   @override
-  List<Object> get props => [message];
+  List<Object> get props => [meal];
 }

@@ -1,16 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:meals/features/categories/data/models/category_model.dart';
 import 'package:meals/features/meals/domain/entities/meal_entity.dart';
 import 'package:meals/features/meals/presentation/bloc/meals_bloc.dart';
-import 'package:meals/features/meals/presentation/widgets/meal_item.dart';
+import 'package:meals/features/meals/presentation/widgets/meal_item_widget.dart';
+
+class MealListPageArguments {
+  final MealsEvent event;
+  final String title;
+
+  MealListPageArguments({
+    required this.event,
+    required this.title,
+  });
+}
 
 class MealListPage extends StatefulWidget {
-  final CategoryModel category;
-
+  final MealListPageArguments arguments;
   const MealListPage({
     Key? key,
-    required this.category,
+    required this.arguments,
   }) : super(key: key);
 
   @override
@@ -24,7 +32,7 @@ class _MealListPageState extends State<MealListPage> {
   void initState() {
     super.initState();
     BlocProvider.of<MealsBloc>(context).add(
-      FetchMealsByQuery("c=${widget.category.name}"),
+      widget.arguments.event,
     );
   }
 
@@ -32,7 +40,7 @@ class _MealListPageState extends State<MealListPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.category.name ?? ''),
+        title: Text(widget.arguments.title),
       ),
       body: BlocListener<MealsBloc, MealsState>(
         listener: (context, state) {
@@ -48,8 +56,13 @@ class _MealListPageState extends State<MealListPage> {
                 child: CircularProgressIndicator(),
               );
             } else if (state is MealsError) {
-              return Center(
-                child: Text(state.message),
+              if (state.message == 'EmptyResultFailure()') {
+                return const Center(
+                  child: Text('No meals found'),
+                );
+              }
+              return const Center(
+                child: Text('Something went wrong'),
               );
             }
             return GridView.builder(
@@ -58,7 +71,7 @@ class _MealListPageState extends State<MealListPage> {
               itemBuilder: (context, index) {
                 final meal = meals[index];
 
-                return MealItem(meal: meal);
+                return MealItemWidget(meal: meal);
               },
               gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
                 maxCrossAxisExtent: 300,

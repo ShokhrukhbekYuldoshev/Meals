@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:meals/core/router/app_router.dart';
 import 'package:meals/features/meals/domain/entities/meal_entity.dart';
 
-class MealItem extends StatelessWidget {
+class MealItemWidget extends StatelessWidget {
   final MealEntity meal;
-  const MealItem({super.key, required this.meal});
+  const MealItemWidget({super.key, required this.meal});
 
   @override
   Widget build(BuildContext context) {
