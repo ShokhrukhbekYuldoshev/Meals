@@ -130,7 +130,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 **Shokhrukhbek Yuldoshev**
 
 -   Github: [@ShokhrukhbekYuldoshev](https://github.com/ShokhrukhbekYuldoshev)
--   Email: [@shokhrukhbekdev@gmail.com](mailto:shokhrukhbekdev@gmail.com)
+-   Email: [@shokh.xyz@gmail.com](mailto:shokh.xyz@gmail.com)
 
 ## 🌟 Show your support
 
