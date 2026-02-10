@@ -14,143 +14,245 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  @override
-  initState() {
-    super.initState();
-    BlocProvider.of<MealsBloc>(context).add(LookupRandomMeal());
-  }
-
   int selectedIndex = 0;
 
   @override
+  void initState() {
+    super.initState();
+    context.read<MealsBloc>().add(LookupRandomMeal());
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Meals'),
-      ),
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: selectedIndex,
-        onDestinationSelected: (index) {
-          setState(() {
-            selectedIndex = index;
-          });
-        },
-        destinations: const [
-          NavigationDestination(
-            icon: Icon(Icons.home),
-            label: 'Home',
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isDesktop = constraints.maxWidth >= 1024;
+
+        return Scaffold(
+          appBar: AppBar(title: const Text('Meals'), centerTitle: !isDesktop),
+          body: Row(
+            children: [
+              if (isDesktop) _buildNavigationRail(),
+              Expanded(child: _buildBody(constraints.maxWidth)),
+            ],
           ),
-          NavigationDestination(
-            icon: Icon(Icons.category),
-            label: 'Categories',
-          ),
-          // NavigationDestination(
-          //   icon: Icon(Icons.star),
-          //   label: 'Favorites',
-          // ),
-        ],
-      ),
-      body: IndexedStack(
-        index: selectedIndex,
-        children: [
-          SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                _buildMealBanner(),
-                _buildSearchBar(),
-                _buildMealsByFirstLetter(),
-              ],
-            ),
-          ),
-          const CategoriesPage(),
-          // FavoritesPage(),
-        ],
+          bottomNavigationBar: isDesktop ? null : _buildBottomNavigation(),
+        );
+      },
+    );
+  }
+
+  // ================= NAVIGATION =================
+
+  Widget _buildBottomNavigation() {
+    return NavigationBar(
+      selectedIndex: selectedIndex,
+      onDestinationSelected: (index) {
+        setState(() => selectedIndex = index);
+      },
+      destinations: const [
+        NavigationDestination(icon: Icon(Icons.home), label: 'Home'),
+        NavigationDestination(icon: Icon(Icons.category), label: 'Categories'),
+      ],
+    );
+  }
+
+  Widget _buildNavigationRail() {
+    return NavigationRail(
+      selectedIndex: selectedIndex,
+      onDestinationSelected: (index) {
+        setState(() => selectedIndex = index);
+      },
+      labelType: NavigationRailLabelType.all,
+      destinations: const [
+        NavigationRailDestination(icon: Icon(Icons.home), label: Text('Home')),
+        NavigationRailDestination(
+          icon: Icon(Icons.category),
+          label: Text('Categories'),
+        ),
+      ],
+    );
+  }
+
+  // ================= BODY =================
+
+  Widget _buildBody(double width) {
+    return Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 1100),
+        child: IndexedStack(
+          index: selectedIndex,
+          children: [_buildHomeTab(width), const CategoriesPage()],
+        ),
       ),
     );
   }
 
-  // Show a random meal banner
+  // ================= HOME TAB =================
+
+  Widget _buildHomeTab(double width) {
+    return CustomScrollView(
+      slivers: [
+        SliverToBoxAdapter(child: _buildMealBanner()),
+        SliverToBoxAdapter(child: _buildSearchBar()),
+        SliverToBoxAdapter(child: _buildMealsByFirstLetter(width)),
+        const SliverPadding(padding: EdgeInsets.only(bottom: 48)),
+      ],
+    );
+  }
+
+  // ================= RANDOM MEAL =================
+
   Widget _buildMealBanner() {
     return BlocBuilder<MealsBloc, MealsState>(
-      buildWhen: (previous, current) => current is RandomMealLoaded,
+      buildWhen: (_, current) => current is RandomMealLoaded,
       builder: (context, state) {
         if (state is MealsLoading) {
-          return const Center(
-            child: CircularProgressIndicator(),
+          return const Padding(
+            padding: EdgeInsets.all(48),
+            child: Center(child: CircularProgressIndicator()),
           );
-        } else if (state is MealsError) {
-          return Center(
-            child: Text(state.message),
-          );
-        } else if (state is RandomMealLoaded) {
-          return MealBannerWidget(meal: state.meal);
         }
+
+        if (state is MealsError) {
+          return Padding(
+            padding: const EdgeInsets.all(16),
+            child: Text(
+              state.message,
+              style: TextStyle(color: Theme.of(context).colorScheme.error),
+            ),
+          );
+        }
+
+        if (state is RandomMealLoaded) {
+          return Padding(
+            padding: const EdgeInsets.all(16),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(28),
+              child: MealBannerWidget(meal: state.meal),
+            ),
+          );
+        }
+
         return const SizedBox.shrink();
       },
     );
   }
 
-  // Search bar
+  // ================= SEARCH =================
+
   Widget _buildSearchBar() {
     return Padding(
-      padding: const EdgeInsets.all(20),
-      child: TextField(
-        decoration: InputDecoration(
-          hintText: 'Search meals',
-          prefixIcon: const Icon(Icons.search),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(20),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: Card(
+        elevation: 2,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        child: TextField(
+          decoration: const InputDecoration(
+            hintText: 'Search meals...',
+            prefixIcon: Icon(Icons.search),
+            border: InputBorder.none,
+            contentPadding: EdgeInsets.all(16),
           ),
+          textInputAction: TextInputAction.search,
+          onSubmitted: (value) {
+            if (value.trim().isEmpty) return;
+
+            Navigator.of(context).pushNamed(
+              AppRouter.mealListRoute,
+              arguments: MealListPageArguments(
+                event: SearchMealsByName(value),
+                title: 'Search results for "$value"',
+              ),
+            );
+          },
         ),
-        onSubmitted: (value) {
-          if (value.isEmpty) return;
-          Navigator.of(context).pushNamed(
-            AppRouter.mealListRoute,
-            arguments: MealListPageArguments(
-              event: SearchMealsByName(value),
-              title: 'Search results for $value',
-            ),
-          );
-        },
       ),
     );
   }
 
-  // List all meals by first letter: return a-z list clickable
-  Widget _buildMealsByFirstLetter() {
+  // ================= A–Z GRID =================
+
+  Widget _buildMealsByFirstLetter(double width) {
     const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
-    return Flexible(
+    final isDesktop = width >= 900;
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 24, 16, 16),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const SizedBox(height: 20),
-          Text(
-            'Meals by first letter',
-            style: Theme.of(context).textTheme.titleLarge,
+          Row(
+            children: [
+              Text(
+                'Browse by letter',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+              const SizedBox(width: 8),
+              Text(
+                'A–Z',
+                style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                  color: Theme.of(context).hintColor,
+                ),
+              ),
+            ],
           ),
-          const SizedBox(height: 20),
-          ListView.builder(
-            itemCount: letters.length,
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemBuilder: (context, index) {
-              final letter = letters[index];
-              return ListTile(
-                title: Text(letter),
+          const SizedBox(height: 12),
+          Wrap(
+            spacing: isDesktop ? 8 : 10,
+            runSpacing: isDesktop ? 8 : 10,
+            children: letters.split('').map((letter) {
+              return _LetterChip(
+                letter: letter,
                 onTap: () {
                   Navigator.of(context).pushNamed(
                     AppRouter.mealListRoute,
                     arguments: MealListPageArguments(
                       event: ListMealsByFirstLetter(letter),
-                      title: 'Meals by $letter',
+                      title: 'Meals starting with $letter',
                     ),
                   );
                 },
               );
-            },
+            }).toList(),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _LetterChip extends StatelessWidget {
+  final String letter;
+  final VoidCallback onTap;
+
+  const _LetterChip({required this.letter, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(10),
+        child: Container(
+          width: 36,
+          height: 32,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            border: Border.all(color: theme.dividerColor),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Text(
+            letter,
+            style: theme.textTheme.labelLarge?.copyWith(
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
       ),
     );
   }

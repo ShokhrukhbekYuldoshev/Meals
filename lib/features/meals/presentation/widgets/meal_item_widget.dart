@@ -9,16 +9,13 @@ class MealItemWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(15),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
       child: InkWell(
         borderRadius: BorderRadius.circular(15),
         onTap: () {
-          Navigator.of(context).pushNamed(
-            AppRouter.mealDetailsRoute,
-            arguments: meal.id,
-          );
+          Navigator.of(
+            context,
+          ).pushNamed(AppRouter.mealDetailsRoute, arguments: meal.id);
         },
         child: Column(
           children: [

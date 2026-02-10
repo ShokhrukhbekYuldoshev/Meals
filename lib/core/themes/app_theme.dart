@@ -2,15 +2,10 @@ import 'package:flutter/material.dart';
 
 class AppTheme {
   ThemeData get lightTheme {
-    return ThemeData(
-      useMaterial3: true,
-    );
+    return ThemeData();
   }
 
   ThemeData get darkTheme {
-    return ThemeData(
-      useMaterial3: true,
-      colorScheme: const ColorScheme.dark(),
-    );
+    return ThemeData(colorScheme: const ColorScheme.dark());
   }
 }

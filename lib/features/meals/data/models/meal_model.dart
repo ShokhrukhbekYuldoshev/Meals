@@ -2,34 +2,20 @@ import 'package:meals/features/meals/domain/entities/meal_entity.dart';
 
 class MealModel extends MealEntity {
   const MealModel({
-    required String id,
-    required String name,
-    String? thumbnail,
-    String? category,
-    String? area,
-    String? instructions,
-    String? tags,
-    String? youtube,
-    String? source,
-    String? imageSource,
-    bool? isFavorite,
-    required List<String> ingredients,
-    required List<String> measures,
-  }) : super(
-          id: id,
-          name: name,
-          thumbnail: thumbnail,
-          category: category,
-          area: area,
-          instructions: instructions,
-          tags: tags,
-          youtube: youtube,
-          source: source,
-          imageSource: imageSource,
-          isFavorite: isFavorite,
-          ingredients: ingredients,
-          measures: measures,
-        );
+    required super.id,
+    required super.name,
+    super.thumbnail,
+    super.category,
+    super.area,
+    super.instructions,
+    super.tags,
+    super.youtube,
+    super.source,
+    super.imageSource,
+    super.isFavorite,
+    required super.ingredients,
+    required super.measures,
+  });
 
   factory MealModel.fromJson(Map<String, dynamic> json) {
     final ingredients = <String>[];
@@ -60,18 +46,18 @@ class MealModel extends MealEntity {
   }
 
   factory MealModel.fromEntity(MealEntity entity) => MealModel(
-        id: entity.id,
-        name: entity.name,
-        thumbnail: entity.thumbnail,
-        category: entity.category,
-        area: entity.area,
-        instructions: entity.instructions,
-        tags: entity.tags,
-        youtube: entity.youtube,
-        source: entity.source,
-        imageSource: entity.imageSource,
-        isFavorite: entity.isFavorite,
-        ingredients: entity.ingredients,
-        measures: entity.measures,
-      );
+    id: entity.id,
+    name: entity.name,
+    thumbnail: entity.thumbnail,
+    category: entity.category,
+    area: entity.area,
+    instructions: entity.instructions,
+    tags: entity.tags,
+    youtube: entity.youtube,
+    source: entity.source,
+    imageSource: entity.imageSource,
+    isFavorite: entity.isFavorite,
+    ingredients: entity.ingredients,
+    measures: entity.measures,
+  );
 }

@@ -7,7 +7,7 @@ import 'package:meals/features/meals/presentation/pages/meal_list_page.dart';
 class CategoryItem extends StatelessWidget {
   final CategoryEntity category;
 
-  const CategoryItem({Key? key, required this.category}) : super(key: key);
+  const CategoryItem({super.key, required this.category});
 
   @override
   Widget build(BuildContext context) {
@@ -32,10 +32,7 @@ class CategoryItem extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Image.network(
-                category.thumbnail ?? '',
-                fit: BoxFit.cover,
-              ),
+              Image.network(category.thumbnail ?? '', fit: BoxFit.cover),
               const SizedBox(height: 10),
               Text(
                 category.name ?? '',

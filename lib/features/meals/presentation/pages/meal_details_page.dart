@@ -6,169 +6,287 @@ import 'package:url_launcher/url_launcher_string.dart';
 class MealDetailsPage extends StatefulWidget {
   final String id;
 
-  const MealDetailsPage({Key? key, required this.id}) : super(key: key);
+  const MealDetailsPage({super.key, required this.id});
 
   @override
   State<MealDetailsPage> createState() => _MealDetailsPageState();
 }
 
 class _MealDetailsPageState extends State<MealDetailsPage> {
+  bool get isDesktop => MediaQuery.of(context).size.width >= 1000;
+
   @override
   void initState() {
     super.initState();
-    BlocProvider.of<MealsBloc>(context).add(GetMealById(widget.id));
+    context.read<MealsBloc>().add(GetMealById(widget.id));
   }
 
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<MealsBloc, MealsState>(
       builder: (context, state) {
-        return Scaffold(
-          appBar: AppBar(
-            title: Text(state is MealLoaded ? state.meal.name : ''),
-          ),
-          body: _buildBody(state),
-        );
+        if (state is MealLoaded) {
+          final meal = state.meal;
+
+          return Scaffold(
+            body: CustomScrollView(
+              slivers: [
+                _buildSliverHeader(meal),
+                SliverToBoxAdapter(
+                  child: Center(
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 1100),
+                      child: Padding(
+                        padding: const EdgeInsets.all(24),
+                        child: isDesktop
+                            ? _buildDesktopContent(meal)
+                            : _buildMobileContent(meal),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          );
+        }
+
+        if (state is MealsError) {
+          return Scaffold(
+            appBar: AppBar(),
+            body: Center(child: Text(state.message)),
+          );
+        }
+
+        return const Scaffold(body: Center(child: CircularProgressIndicator()));
       },
     );
   }
 
-  _buildBody(MealsState state) {
-    if (state is MealLoaded) {
-      return SingleChildScrollView(
-        child: Container(
-          padding: const EdgeInsets.all(25),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
+  // ================= HEADER =================
+
+  SliverAppBar _buildSliverHeader(dynamic meal) {
+    return SliverAppBar(
+      expandedHeight: 360,
+      pinned: true,
+      flexibleSpace: FlexibleSpaceBar(
+        title: Text(meal.name, maxLines: 1, overflow: TextOverflow.ellipsis),
+        background: Hero(
+          tag: meal.id,
+          child: Stack(
+            fit: StackFit.expand,
             children: [
-              Image.network(
-                state.meal.thumbnail ?? '',
-                height: 300,
-                width: double.infinity,
-              ),
-              const SizedBox(height: 10),
-
-              // Tags
-              state.meal.tags?.isEmpty ?? true
-                  ? const SizedBox.shrink()
-                  : Wrap(
-                      spacing: 5,
-                      runSpacing: 5,
-                      children: state.meal.tags!
-                          .split(',')
-                          .map(
-                            (e) => Chip(
-                              label: Text(e),
-                            ),
-                          )
-                          .toList(),
-                    ),
-              const SizedBox(height: 10),
-
-              // Category
-              Text(
-                "Category: ${state.meal.category}",
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
-              const SizedBox(height: 10),
-
-              // Area
-              Text(
-                "Area: ${state.meal.area}",
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
-              const SizedBox(height: 10),
-
-              // Youtube link
-              state.meal.youtube == null
-                  ? const SizedBox.shrink()
-                  : Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        TextButton(
-                          onPressed: () {
-                            launchUrlString(state.meal.youtube ?? '');
-                          },
-                          child: Text(
-                            'Watch on YouTube',
-                            style: Theme.of(context).textTheme.titleMedium,
-                          ),
-                        ),
-                        const SizedBox(height: 10),
-                      ],
-                    ),
-
-              // Ingredients
-              DataTable(
-                // every second row is grey
-                headingRowColor: MaterialStateProperty.all(
-                  Theme.of(context).colorScheme.secondary,
+              Image.network(meal.thumbnail ?? '', fit: BoxFit.cover),
+              const DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [Colors.transparent, Colors.black54],
+                  ),
                 ),
-                columnSpacing: 0,
-                dataRowColor: MaterialStateProperty.resolveWith<Color>(
-                  (Set<MaterialState> states) {
-                    if (states.contains(MaterialState.selected)) {
-                      return Theme.of(context)
-                          .colorScheme
-                          .secondary
-                          .withOpacity(0.08);
-                    }
-                    return Colors.grey.withOpacity(0.3);
-                  },
-                ),
-                columns: const [
-                  DataColumn(label: Text('Ingredient')),
-                  DataColumn(label: Text('Measure')),
-                ],
-                rows: state.meal.ingredients.asMap().entries.map((entry) {
-                  final ingredient = entry.value;
-                  late final String measure;
-                  try {
-                    measure = state.meal.measures[entry.key];
-                  } catch (e) {
-                    measure = '';
-                  }
-
-                  return DataRow(
-                    cells: [
-                      DataCell(Text(ingredient)),
-                      DataCell(Text(measure)),
-                    ],
-                  );
-                }).toList(),
-              ),
-              const SizedBox(height: 10),
-              // Instructions, each sentence is a step is more than 6 characters
-              Stepper(
-                physics: const NeverScrollableScrollPhysics(),
-                steps: state.meal.instructions!
-                    .split('.')
-                    .where((element) => element.length > 5)
-                    .map(
-                      (e) => Step(
-                        title: Text(e),
-                        isActive: true,
-                        content: const SizedBox.shrink(),
-                      ),
-                    )
-                    .toList(),
-                controlsBuilder:
-                    (BuildContext context, ControlsDetails details) {
-                  return const Row();
-                },
               ),
             ],
           ),
         ),
-      );
-    } else if (state is MealsError) {
-      return Center(
-        child: Text(state.message),
-      );
-    } else {
-      return const Center(
-        child: CircularProgressIndicator(),
-      );
+      ),
+    );
+  }
+
+  // ================= CONTENT =================
+
+  Widget _buildMobileContent(dynamic meal) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildQuickInfo(meal),
+        const SizedBox(height: 32),
+        _buildIngredients(meal),
+        const SizedBox(height: 32),
+        _buildInstructions(meal),
+        _buildYoutubeButton(meal),
+      ],
+    );
+  }
+
+  Widget _buildDesktopContent(dynamic meal) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildQuickInfo(meal),
+        const SizedBox(height: 32),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(child: _buildIngredients(meal)),
+            const SizedBox(width: 32),
+            Expanded(child: _buildInstructions(meal)),
+          ],
+        ),
+        _buildYoutubeButton(meal),
+      ],
+    );
+  }
+
+  // ================= QUICK INFO =================
+
+  Widget _buildQuickInfo(dynamic meal) {
+    final theme = Theme.of(context);
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surfaceContainerHighest.withValues(
+          alpha: 0.35,
+        ),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          _infoItem(Icons.restaurant, meal.category ?? "Meal"),
+          _infoItem(Icons.public, meal.area ?? "World"),
+          _infoItem(Icons.list_alt, "${meal.ingredients.length} ingredients"),
+        ],
+      ),
+    );
+  }
+
+  Widget _infoItem(IconData icon, String label) {
+    return Column(
+      children: [
+        Icon(icon, color: Theme.of(context).colorScheme.primary),
+        const SizedBox(height: 4),
+        Text(label, style: const TextStyle(fontWeight: FontWeight.w600)),
+      ],
+    );
+  }
+
+  // ================= INGREDIENTS =================
+
+  Widget _buildIngredients(dynamic meal) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _sectionTitle("Ingredients"),
+        const SizedBox(height: 12),
+        GridView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: meal.ingredients.length,
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            mainAxisSpacing: 12,
+            crossAxisSpacing: 12,
+            childAspectRatio: 4,
+          ),
+          itemBuilder: (context, index) {
+            final ingredient = meal.ingredients[index];
+            final measure = index < meal.measures.length
+                ? meal.measures[index]
+                : "";
+
+            return Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              decoration: BoxDecoration(
+                border: Border.all(color: Theme.of(context).dividerColor),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(ingredient, overflow: TextOverflow.ellipsis),
+                  ),
+                  Text(
+                    measure,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w600,
+                      color: Colors.grey,
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        ),
+      ],
+    );
+  }
+
+  // ================= INSTRUCTIONS =================
+
+  Widget _buildInstructions(dynamic meal) {
+    final steps = meal.instructions!
+        .split('.')
+        .where((String s) => s.trim().length > 5)
+        .toList();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _sectionTitle("Instructions"),
+        const SizedBox(height: 12),
+        ...steps.asMap().entries.map((entry) {
+          return Card(
+            margin: const EdgeInsets.only(bottom: 12),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  CircleAvatar(
+                    radius: 14,
+                    backgroundColor: Theme.of(context).colorScheme.primary,
+                    child: Text(
+                      "${entry.key + 1}",
+                      style: const TextStyle(color: Colors.white, fontSize: 12),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      entry.value.trim(),
+                      style: const TextStyle(height: 1.5),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        }),
+      ],
+    );
+  }
+
+  // ================= YOUTUBE =================
+
+  Widget _buildYoutubeButton(dynamic meal) {
+    if (meal.youtube == null || meal.youtube!.isEmpty) {
+      return const SizedBox.shrink();
     }
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 32),
+      child: Center(
+        child: OutlinedButton.icon(
+          onPressed: () => launchUrlString(meal.youtube!),
+          icon: const Icon(Icons.play_arrow),
+          label: const Text("Watch Video Recipe"),
+        ),
+      ),
+    );
+  }
+
+  // ================= SHARED =================
+
+  Widget _sectionTitle(String text) {
+    return Text(
+      text,
+      style: Theme.of(
+        context,
+      ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+    );
   }
 }

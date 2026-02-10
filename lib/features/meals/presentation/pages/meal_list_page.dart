@@ -8,18 +8,12 @@ class MealListPageArguments {
   final MealsEvent event;
   final String title;
 
-  MealListPageArguments({
-    required this.event,
-    required this.title,
-  });
+  MealListPageArguments({required this.event, required this.title});
 }
 
 class MealListPage extends StatefulWidget {
   final MealListPageArguments arguments;
-  const MealListPage({
-    Key? key,
-    required this.arguments,
-  }) : super(key: key);
+  const MealListPage({super.key, required this.arguments});
 
   @override
   State<MealListPage> createState() => _MealListPageState();
@@ -31,17 +25,13 @@ class _MealListPageState extends State<MealListPage> {
   @override
   void initState() {
     super.initState();
-    BlocProvider.of<MealsBloc>(context).add(
-      widget.arguments.event,
-    );
+    BlocProvider.of<MealsBloc>(context).add(widget.arguments.event);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.arguments.title),
-      ),
+      appBar: AppBar(title: Text(widget.arguments.title)),
       body: BlocListener<MealsBloc, MealsState>(
         listener: (context, state) {
           if (state is MealsLoaded) {
@@ -52,18 +42,12 @@ class _MealListPageState extends State<MealListPage> {
         child: BlocBuilder<MealsBloc, MealsState>(
           builder: (context, state) {
             if (state is MealsLoading) {
-              return const Center(
-                child: CircularProgressIndicator(),
-              );
+              return const Center(child: CircularProgressIndicator());
             } else if (state is MealsError) {
               if (state.message == 'EmptyResultFailure()') {
-                return const Center(
-                  child: Text('No meals found'),
-                );
+                return const Center(child: Text('No meals found'));
               }
-              return const Center(
-                child: Text('Something went wrong'),
-              );
+              return const Center(child: Text('Something went wrong'));
             }
             return GridView.builder(
               padding: const EdgeInsets.all(25),

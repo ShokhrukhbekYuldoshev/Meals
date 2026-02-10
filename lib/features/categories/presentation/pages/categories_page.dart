@@ -4,16 +4,14 @@ import 'package:meals/features/categories/presentation/bloc/categories_bloc.dart
 import 'package:meals/features/categories/presentation/widgets/category_item.dart';
 
 class CategoriesPage extends StatelessWidget {
-  const CategoriesPage({Key? key}) : super(key: key);
+  const CategoriesPage({super.key});
 
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<CategoriesBloc, CategoriesState>(
       builder: (context, state) {
         if (state is CategoriesLoading) {
-          return const Center(
-            child: CircularProgressIndicator(),
-          );
+          return const Center(child: CircularProgressIndicator());
         } else if (state is CategoriesLoaded) {
           return ListView.builder(
             itemCount: state.categories.length,
